@@ -1,0 +1,99 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Dec 13 12:40:14 2021
+
+@author: USER
+"""
+
+import os
+from nltk.parse import stanford as SParse
+from nltk.tag import stanford as STag
+from nltk.tokenize import StanfordSegmenter
+from rake_nltk import Rake
+from nltk import word_tokenize, pos_tag
+
+import nltk
+from nltk.corpus import stopwords
+import re
+import csv
+import numpy as np
+from nltk.tree import Tree
+from nltk.corpus import stopwords
+
+import stanfordnlp
+import itertools 
+
+from datetime import datetime
+from nltk.tokenize import word_tokenize
+
+from nltk.stem.arlstem import ARLSTem
+from poly.polyglot.downloader import downloader
+
+import stanza
+
+arstem = ARLSTem()
+
+downloader.download("sgns2.ar")
+
+#stanfordnlp.download('ar')
+#nltk.download('stopwords')
+stopWords = set(stopwords.words('arabic'))
+
+
+#################### LOADING PACKAGES ####################
+
+os.environ['STANFORD_MODELS'] = 'C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/indexing/stanford-segmenter-2018-10-16/stanford-segmenter-2018-10-16/data/;C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/stanford-tagger-4.2.0/stanford-postagger-full-2020-11-17/models'
+os.environ['STANFORD_PARSER'] = 'C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/indexing/indexing/stanford-parser-full-2018-10-17/stanford-parser-full-2018-10-17'
+os.environ['CLASSPATH'] = 'C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/indexing/stanford-parser-full-2018-10-17/stanford-parser-full-2018-10-17'
+os.environ['JAVAHOME'] = 'C:/Program Files/Java/jdk-17.0.1/bin/java.exe'
+
+jar = "C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/stanford-tagger-4.2.0/stanford-postagger-full-2020-11-17/stanford-postagger.jar"
+model = "C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/stanford-tagger-4.2.0/stanford-postagger-full-2020-11-17/models/arabic.tagger"
+
+#################### ALL NEEDED FUNCTIONS ####################
+'''segmenter = StanfordSegmenter('C:/Users/USER/Desktop/الجامعة الالمانية/CoreNLP/indexing/stanford-segmenter-2018-10-16/stanford-segmenter-2018-10-16/stanford-segmenter-3.9.2.jar')
+segmenter.default_config('ar')
+
+#fileWords =  open("C:/Users/USER/Desktop/test.txt", "r", encoding="utf8")
+text =segmenter.segment_file("عمون - شكا مواطنون من صعوبة تحميل تطبيق سند الخاص بعملية التفتيش للدخول الى المنشآت ومراكز التسوق والاتصالات")
+
+print(text)'''
+
+#################### Text Segemnetation ####################
+f = open("C:/Users/USER/Desktop/test.txt", "r", encoding="utf8")
+text = f.read()
+nlp = stanza.Pipeline(lang='ar', processors='tokenize')
+doc = nlp(text)
+fileWords =  open("C:/Users/USER/Desktop/test2.txt", "w", encoding="utf8")
+for i, sentence in enumerate(doc.sentences):
+    fileWords.write(f'====== Sentence {i+1} tokens =======')
+    for token in sentence.tokens:
+        fileWords.write(f'id: {token.id}\ttext: {token.text}')
+        fileWords.write("\n")
+fileWords.close()
+
+#################### P.O.S Tagger ####################
+
+nlp = stanza.Pipeline(lang='ar', processors='tokenize,mwt,pos')
+doc = nlp(text)
+filePOS =  open("C:/Users/USER/Desktop/POS.txt", "w", encoding="utf8")
+for sent in doc.sentences:
+     for word in sent.words:
+         if word.feats:
+            filePOS.write(f'word: {word.text}\tupos: {word.upos}')
+            filePOS.write("\n")
+         else:
+            "_"
+filePOS.close()
+
+#################### Word Stemming ####################
+
+nlp = stanza.Pipeline(lang='ar', processors='tokenize,mwt,pos,lemma')
+doc = nlp(text)
+
+fileStem =  open("C:/Users/USER/Desktop/Word Stemming.txt", "w", encoding="utf8")
+for sent in doc.sentences:
+     for word in sent.words:
+         fileStem.write(f'word: {word.text+" "}\tlemma: {word.lemma}')
+         fileStem.write("\n")
+fileStem.close() 
