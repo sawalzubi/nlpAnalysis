@@ -1,0 +1,66 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Apr 17 13:34:56 2022
+
+@author: Sawsan
+"""
+
+import csv
+import logging
+
+count = 1
+header = "num, sentiment analysis"
+#get the data from csv files
+file = open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/Sentiment analysis over interactions with likes/تطبيق سند.txt','a', encoding='utf-8')
+file.write(header + "\n")
+with open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/facebook data/تطبيق سند.csv', newline='',encoding='utf-8') as csvfile:
+    data = csv.DictReader(csvfile)
+    for row in data:
+        try:  
+            count += 1
+            sad = int(row['Sad'])
+            love = int(row['Love'])
+            care = int(row['Care'])
+            likes = int(row['Likes'])
+            angry = int(row['Angry'])
+        # handle exceptions for Not A Value fields 
+        except:
+            print("N/A vlaues")
+            
+        # check interactions depending on love, sad, and angry 
+        if(love > sad or love > angry):
+            print('-------------------------------------------------')
+            print('Love: ' + str(love) +'\n' + 'Sad: '  + str(sad) +'\n' )
+            print('Love: ' + str(love) +'\n' + 'Angry: '  + str(angry) +'\n' )
+            print("Positive")
+            file.write(str(count) + ", ")
+            file.write("Positive")
+            file.write("\n")
+         # check interactions depending on care, sad, and angry 
+        elif (care > sad or care > angry):
+            print('-------------------------------------------------')
+            print('Care: ' + str(care) +'\n' + 'Sad: '  + str(sad) +'\n' )
+            print('Care: ' + str(care) +'\n' + 'Angry: '  + str(angry) +'\n' )
+            print("Positive")
+            file.write(str(count) + ", ")
+            file.write("Positive")
+            file.write("\n")
+        
+        else:
+             print('-------------------------------------------------')
+             print('Sad: ' + str(sad) +'\n' + 'Love: '  + str(love) +'\n' )
+             print('Sad: ' + str(sad) +'\n' + 'Care: '  + str(care) +'\n' )
+             print('Angry: ' + str(angry) +'\n' + 'Love: '  + str(love) +'\n' )
+             print('Angry: ' + str(angry) +'\n' + 'Care: '  + str(care) +'\n' )
+             print("Negative")
+             file.write(str(count) + ", ")
+             file.write("Negative")
+             file.write("\n")
+file.close()   
+
+
+'''elif (likes > sad or likes > angry or likes > love or likes > care):
+            print("Positive")
+            file.write(str(count) + ", ")
+            file.write("Positive")
+            file.write("\n")'''      
