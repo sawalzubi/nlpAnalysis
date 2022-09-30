@@ -1,0 +1,83 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 22 11:39:38 2022
+
+@author: Sawsan
+"""
+
+import csv
+import logging
+
+count = 1
+totalInteractions = 0
+totalViews = 0
+totalFollowers = 0
+e = 2.718
+
+header = "num, popularity_score, reach_score"
+#### open popularity and reach score ####
+file = open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/Popularity scores and reaching/Facebook/نقابة المعلمين.txt','a', encoding='utf-8')
+file.write(header + "\n")
+with open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/facebook data/نقابة المعلمين.csv', newline='',encoding='utf-8') as csvfile:
+ data = csv.DictReader(csvfile)
+ for row in data:
+     try:  
+         #get the number of interactions & followers from csv files
+         interactions = row['Total Interactions']
+         views = row['Post Views']
+         followers = row['Followers at Posting']
+         #remove , from the required number 
+         replaced = interactions.replace(',' , '')
+         totalInteractions += int(replaced)
+         totalViews += int(views)
+         totalFollowers += int(followers)
+     except:
+        print("N/A vlaues")
+        
+'''print("total interactions " + str(totalInteractions))
+print("total views " + str(totalViews))
+print("total followers " + str(totalFollowers)) '''      
+      
+with open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/facebook data/نقابة المعلمين.csv', newline='',encoding='utf-8') as csvfile:
+ data = csv.DictReader(csvfile)
+ for row in data:
+     try:    
+         count += 1
+         interactions = row['Total Interactions']
+         views = row['Post Views']
+         followers = row['Followers at Posting']
+         replaced = interactions.replace(',' , '')
+         interactionsPerPost = int(replaced)
+         viewsPerPost = int(views)
+         followersPerPost = int(followers)
+          # calculate the popularity and reachbility 
+         reach_score = followersPerPost / totalFollowers
+         popularity_score = ((0.7 * interactionsPerPost) + (0.3 * viewsPerPost))/ ((0.7 * totalInteractions) + (0.3 * totalViews))
+         
+         '''print (0.7 * interactionsPerPost)
+         print (0.3 * viewsPerPost)
+         
+         print (0.7 * totalInteractions)
+         print (0.3 * totalViews)
+         #print(popularity_score)'''
+         ePopularity = e ** popularity_score 
+         print (ePopularity)
+        # eReach = e ** reach_score 
+        # print (eReach)
+         '''file.write(str(count) + ", ")
+         file.write(str(popularity_score) + ", ")
+         file.write(str(reach_score))
+         file.write("\n")'''
+     except:
+        print("N/A vlaues")
+         
+file.close()    
+         
+#print("total interactions " + str(totalInteractions))
+#print("total views " + str(totalViews))
+#print("total followers " + str(totalFollowers))  
+
+#file.write(str(count) + ", ")
+#        file.write(str(popularity_score) + ", ")
+#        file.write(str(reach_score))
+#        file.write("\n")
