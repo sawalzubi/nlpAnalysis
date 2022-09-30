@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Aug 30 10:58:09 2021
+
+@author: USER
+"""
+
+# Python Script to Extract tweets of a
+# particular Hashtag using Tweepy and Pandas
+
+
+# import modules
+import pandas as pd
+import tweepy
+import requests
+import os
+import json
+import itertools as IT
+import csv
+tweet_ids = []
+usernames = []
+replies=[]
+user = ""
+reply = ""
+# function to display data of each tweet
+def printtweetdata(n, ith_tweet):
+        print()
+        print(f"Tweet {n}:")
+        print(f"Username:{ith_tweet[0]}")
+        print(f"tweet_ID:{ith_tweet[1]}")
+        print(f"userID:{ith_tweet[2]}")
+        print(f"creation:{ith_tweet[3]}")
+        print(f"location:{ith_tweet[4]}")
+        print(f"Total Tweets:{ith_tweet[5]}")
+        print(f"likes:{ith_tweet[6]}")
+        print(f"retweets:{ith_tweet[7]}")
+        print(f"hashtag:{ith_tweet[8]}")
+
+
+# function to perform data extraction
+def scrape(words, numtweet, since_date,until_date):
+    
+	# Creating DataFrame using pandas
+    db = pd.DataFrame(columns=['username', 'tweet_ID', 'userID',
+							'creation', 'location', 'text','likes','retweets', 'hashtags'])
+
+	# We are using .Cursor() to search through twitter for the required tweets.
+	# The number of tweets can be restricted using .items(number of tweets)
+    tweets = tweepy.Cursor(api.search_full_archive,"research",query=words,fromDate=since_date, toDate=until_date).items(numtweet)
+	
+	# .Cursor() returns an iterable object. Each item in
+	# the iterator has various attributes that you can access to
+	# get information about each tweet
+    list_tweets = [tweet for tweet in tweets]
+	
+	# Counter to maintain Tweet Count
+    i = 1
+	
+	# we will iterate over each tweet in the list for extracting information about each tweet
+    for tweet in list_tweets:
+            username = tweet.user.screen_name
+            tweet_ID = tweet.id_str
+            userID= tweet.author.id
+            creation = tweet.created_at
+            location = tweet.user.location
+            likes = tweet.favorite_count
+            retweets = tweet.retweet_count
+            hashtags = tweet.entities['hashtags']
+            
+            tweet_ids.append(tweet_ID)
+            usernames.append(username)
+    
+		# Retweets can be distinguished by a retweeted_status attribute,
+		# in case it is an invalid reference, except block will be executed
+            
+            text = tweet.text
+            hashtext = list()
+            for j in range(0, len(hashtags)):
+                hashtext.append(hashtags[j]['text'])
+		
+		# Here we are appending all the extracted information in the DataFrame
+            ith_tweet = [username, tweet_ID, userID,
+					creation, location, text, likes,retweets,hashtext]
+            db.loc[len(db)] = ith_tweet
+		
+		# Function call to print tweet data on screen
+            printtweetdata(i, ith_tweet)
+            i = i+1
+    filename = 'C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/test.csv'
+	
+	# we will save our database as a CSV file.
+    db.to_csv(filename)
+    
+    
+if __name__ == '__main__':
+    consumer_key = "bmxjVbuxZX6QS5hMf9bMKpzCD"
+    consumer_secret = "n7V03zQjoA6oyCtGFf6aSfHWs9ZVc52masepRH3AVALWsMqjvF"
+    access_token = "882112320289296384-RZKrGGjwjxT9SZxOQxlivxz7Dz6g44R"
+    access_token_secret = "zmBGz49EsZEDyKZTyjEr8FP2fmyo5pmZvQTPSdTbahO43"
+    
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+    auth.set_access_token(access_token, access_token_secret)
+    api = tweepy.API(auth,wait_on_rate_limit=True)
+	
+    #timestamp for the scrapped data
+    since_date = '201901010000' #year_month_day_hour_min
+    until_date = '202012312359'
+    
+    #the required hashtag to collect data 
+    words = "#مع_المعلم"
+    
+	
+	# number of tweets you want to extract in one run
+    numtweet = 200
+    scrape(words, numtweet,since_date, until_date)
+    print("----------------------------------")
+    print('Scraping has completed!')
+    
