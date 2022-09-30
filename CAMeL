@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Feb  7 17:11:45 2022
+
+@author: s.alzubi
+"""
+#import CAMel tool
+from camel_tools.sentiment import SentimentAnalyzer
+
+# access the preprocessed data
+my_file = open("C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/preprocessing data (More accurate)/Facbook2/نقابة المعلمين.txt","r", encoding='utf-8')
+# output files 
+file_object = open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/sentiment analysis results/Facebook/نقابة المعلمين.txt', 'a', encoding="utf-8")
+
+for line in my_file: 
+    print(line)
+   
+    # the needed tool to use the sentiment analyzer 
+    sa = SentimentAnalyzer.pretrained()
+
+    sentences = line
+    sentiments = sa.predict(sentences)
+
+    print(sentiments)
+    
+    positive='positive'
+    negative='negative'
+    neutral='neutral'
+    # check every sentimnet in output line
+    if positive in sentiments:
+        file_object.write('positive' + ',' + line)
+    elif negative in sentiments:   
+        file_object.write('negative' + ',' + line)
+    elif neutral in sentiments: 
+        file_object.write('neutral' + ',' + line)
+
+file_object.close()
+my_file.close()
+
+
+'''
+sa = SentimentAnalyzer.pretrained()
+
+sentences = ['اقترب  رمضان  ليضيء  شهراً  كاملاً  مليئاً  بالأجواء  الإيمانية  والمطمئنة  تتمنى  يبلغنا  الله  وإياكم  رمضان']
+
+sentiments = sa.predict(sentences)
+
+print(sentiments)'''
