@@ -1,0 +1,87 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Jan 23 12:43:44 2022
+
+@author: USER
+"""
+
+import tweepy
+import csv
+import logging 
+from tweepy import TweepyException
+
+#acces token 
+consumer_key = "Y8V38kK6MHFlMBfpyudCHXLPC"
+consumer_secret = "DTJtZt7QIWbLzepMdzjaUMtJNucl1EtlhEhrreSJUPMXWwy38m"
+access_token = "1063951373799059456-oGuFRvdGr5FFVCHG61LBSJ1tGh2tOW"
+access_token_secret = "Z2V55YJlF4nKV7GGusJ7RRmLAigykqcvuDQ7aRjJxacDl"
+    
+auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+auth.set_access_token(access_token, access_token_secret)
+api = tweepy.API(auth,wait_on_rate_limit=True)
+'''
+popularityW = 0.25
+reachW = 0.5
+'''
+count_likes = 0
+count_retweets = 0
+count_followers = 0
+
+
+header = "num, popularity_score, reach_score"
+
+file = open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/Popularity scores and reaching/Twitter/نقابة المعلمين الاردنيين.txt','a', encoding='utf-8')
+file.write(header + "\n")
+##### Count the number of likes, number of retweets,
+##### and number of followers  using twitter API #####
+
+with open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/نقابة المعلمين الاردنيين.csv', newline='',encoding='utf-8') as csvfile:
+ data = csv.DictReader(csvfile)
+ for row in data:
+     try:
+         num = row['num']
+         username = row['username']
+         tweet_ID = row['tweet_ID']
+         userId = row['userID']
+         likes = row['likes']
+         retweets = row['retweets']
+         follower_count = api.get_user(id = userId).followers_count
+         likes_conv = int(likes)
+         retweets_conv = int(retweets)
+         follower_conv = int(follower_count)
+     
+         count_likes += likes_conv
+         count_retweets += retweets_conv
+         count_followers += follower_conv
+     # handle exceptions if user is not found 
+     except tweepy.TweepyException:
+            logging.error('user not found')
+     
+print ("Total likes: " + str(count_likes))
+print ("Total retweets: " + str(count_retweets))
+print ("Total followers: " + str(count_followers))
+
+
+with open('C:/Users/Sawsan/Desktop/الجامعة الالمانية/output/نقابة المعلمين الاردنيين.csv', newline='',encoding='utf-8') as csvfile:
+ data = csv.DictReader(csvfile)
+ for row in data:
+     try:
+         num = row['num']
+         username = row['username']
+         tweet_ID = row['tweet_ID']
+         userId = row['userID']
+         likes = row['likes']
+         retweets = row['retweets']
+         follower_count = api.get_user(id = userId).followers_count
+         likes_conv = int(likes)
+         retweets_conv = int(retweets)
+         # calculate the popularity and reachbility 
+         reach_score = follower_count / count_followers
+         popularity_score = ((0.4 * likes_conv) + (0.6 * retweets_conv)) / ((0.4 * count_likes) + (0.6 * count_retweets))
+         file.write(str(num) + ", ")
+         file.write(str(popularity_score) + ", ")
+         file.write(str(reach_score))
+         file.write("\n")
+     except tweepy.TweepyException:
+            logging.error('user not found')
+file.close()
