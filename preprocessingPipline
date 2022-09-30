@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Feb 22 13:58:58 2022
+
+@author: s.alzubi
+"""
+
+import string
+import re
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import csv
+
+import nltk
+nltk.download('stopwords')
+nltk.download('punkt')
+
+#preparing punctuations list
+arabic_punctuations = '''`÷×؛<>_()*&^%][ـ،/:"؟.,'{}~¦+|!”…“–ـ«»'''
+english_punctuations = string.punctuation
+punc_to_remove = ''.join(set(arabic_punctuations + english_punctuations))
+punc_to_keep = '+'
+punc_to_escape = '''[]-^'''
+for p in punc_to_keep: punc_to_remove = punc_to_remove.replace(p, '')
+for p in punc_to_escape: punc_to_remove = punc_to_remove.replace(p, '\\{}'.format(p))
+print(punc_to_remove)
+
+def pre_process(text):
+    text = text.replace('\\n', ' ').replace('\n', ' ')
+    text = text.replace('؛', '،')
+    text = re.sub(r'\([^)]+\)', '', text)  # remove parentheses and everything in between
+    text = re.sub(r'[a-zA-Z]', '', text)  # remove non-arabic characters
+    text = re.sub(r'\d+(\.\d+)?', ' رقم ', text)  # replace numbers by special token
+    for p in punc_to_remove: text = text.replace(p, '')  # remove punctuations
+    text = re.sub(r'(.)\1{2,}', r'\1', text)  # remove repeated chars
+    text = re.sub(r'\s+', r' ', text)
+    return text
+
+# getting the data from csv file 
+with open('D:/Sawsan/شغل سوسن/الجامعة الالمانية/output/facebook data/كورونا.csv', newline='',encoding='utf-8') as csvfile:
+    data = csv.DictReader(csvfile)
+    print("كورونا")
+    print("---------------------------------")
+    count = 1
+    for row in data:
+        count += 1
+        text = row['Description'] # the needed row from csv file
+        stop_words = set(stopwords.words('arabic'))
+        pattern = pre_process(text)
+        word_tokens = word_tokenize(pattern)
+        if (len(text) == 0):
+            continue  
+        else:
+            filtered_sentence = [w for w in word_tokens if not w.lower() in stop_words] 
+            filtered_sentence = []
+            stopWordsFile = open('D:/Sawsan/شغل سوسن/الجامعة الالمانية/output/preprocessing data (More accurate)/Facbook2/كورونا.txt','a', encoding='utf-8')
+            stopWordsFile.write(str(count))
+            for word in word_tokens:
+                if not word in stop_words:
+                    print(text)
+                    stopWordsFile.write("  " + word)
+            stopWordsFile.write("\n")    
+            stopWordsFile.close()
